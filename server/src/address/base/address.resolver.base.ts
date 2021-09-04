@@ -14,8 +14,6 @@ import { DeleteAddressArgs } from "./DeleteAddressArgs";
 import { AddressFindManyArgs } from "./AddressFindManyArgs";
 import { AddressFindUniqueArgs } from "./AddressFindUniqueArgs";
 import { Address } from "./Address";
-import { CustomerFindManyArgs } from "../../customer/base/CustomerFindManyArgs";
-import { Customer } from "../../customer/base/Customer";
 import { AddressService } from "../address.service";
 
 @graphql.Resolver(() => Address)
@@ -196,31 +194,5 @@ export class AddressResolverBase {
       }
       throw error;
     }
-  }
-
-  @graphql.ResolveField(() => [Customer])
-  @nestAccessControl.UseRoles({
-    resource: "Address",
-    action: "read",
-    possession: "any",
-  })
-  async customers(
-    @graphql.Parent() parent: Address,
-    @graphql.Args() args: CustomerFindManyArgs,
-    @gqlUserRoles.UserRoles() userRoles: string[]
-  ): Promise<Customer[]> {
-    const permission = this.rolesBuilder.permission({
-      role: userRoles,
-      action: "read",
-      possession: "any",
-      resource: "Customer",
-    });
-    const results = await this.service.findCustomers(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results.map((result) => permission.filter(result));
   }
 }

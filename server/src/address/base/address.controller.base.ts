@@ -15,8 +15,6 @@ import { AddressWhereUniqueInput } from "./AddressWhereUniqueInput";
 import { AddressFindManyArgs } from "./AddressFindManyArgs";
 import { AddressUpdateInput } from "./AddressUpdateInput";
 import { Address } from "./Address";
-import { CustomerWhereInput } from "../../customer/base/CustomerWhereInput";
-import { Customer } from "../../customer/base/Customer";
 
 export class AddressControllerBase {
   constructor(
@@ -63,12 +61,9 @@ export class AddressControllerBase {
       data: data,
       select: {
         address_1: true,
-        address_2: true,
         city: true,
-        createdAt: true,
         id: true,
         state: true,
-        updatedAt: true,
         zip: true,
       },
     });
@@ -108,12 +103,9 @@ export class AddressControllerBase {
       ...args,
       select: {
         address_1: true,
-        address_2: true,
         city: true,
-        createdAt: true,
         id: true,
         state: true,
-        updatedAt: true,
         zip: true,
       },
     });
@@ -148,12 +140,9 @@ export class AddressControllerBase {
       where: params,
       select: {
         address_1: true,
-        address_2: true,
         city: true,
-        createdAt: true,
         id: true,
         state: true,
-        updatedAt: true,
         zip: true,
       },
     });
@@ -209,12 +198,9 @@ export class AddressControllerBase {
         data: data,
         select: {
           address_1: true,
-          address_2: true,
           city: true,
-          createdAt: true,
           id: true,
           state: true,
-          updatedAt: true,
           zip: true,
         },
       });
@@ -250,12 +236,9 @@ export class AddressControllerBase {
         where: params,
         select: {
           address_1: true,
-          address_2: true,
           city: true,
-          createdAt: true,
           id: true,
           state: true,
-          updatedAt: true,
           zip: true,
         },
       });
@@ -267,189 +250,5 @@ export class AddressControllerBase {
       }
       throw error;
     }
-  }
-
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Get("/:id/customers")
-  @nestAccessControl.UseRoles({
-    resource: "Address",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiQuery({
-    type: () => CustomerWhereInput,
-    style: "deepObject",
-    explode: true,
-  })
-  async findManyCustomers(
-    @common.Req() request: Request,
-    @common.Param() params: AddressWhereUniqueInput,
-    @nestAccessControl.UserRoles() userRoles: string[]
-  ): Promise<Customer[]> {
-    const query: CustomerWhereInput = request.query;
-    const permission = this.rolesBuilder.permission({
-      role: userRoles,
-      action: "read",
-      possession: "any",
-      resource: "Customer",
-    });
-    const results = await this.service.findCustomers(params.id, {
-      where: query,
-      select: {
-        address: {
-          select: {
-            id: true,
-          },
-        },
-
-        createdAt: true,
-        email: true,
-        firstName: true,
-        id: true,
-        lastName: true,
-        phone: true,
-        updatedAt: true,
-      },
-    });
-    return results.map((result) => permission.filter(result));
-  }
-
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Post("/:id/customers")
-  @nestAccessControl.UseRoles({
-    resource: "Address",
-    action: "update",
-    possession: "any",
-  })
-  async createCustomers(
-    @common.Param() params: AddressWhereUniqueInput,
-    @common.Body() body: AddressWhereUniqueInput[],
-    @nestAccessControl.UserRoles() userRoles: string[]
-  ): Promise<void> {
-    const data = {
-      customers: {
-        connect: body,
-      },
-    };
-    const permission = this.rolesBuilder.permission({
-      role: userRoles,
-      action: "update",
-      possession: "any",
-      resource: "Address",
-    });
-    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
-    if (invalidAttributes.length) {
-      const roles = userRoles
-        .map((role: string) => JSON.stringify(role))
-        .join(",");
-      throw new common.ForbiddenException(
-        `Updating the relationship: ${
-          invalidAttributes[0]
-        } of ${"Address"} is forbidden for roles: ${roles}`
-      );
-    }
-    await this.service.update({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Patch("/:id/customers")
-  @nestAccessControl.UseRoles({
-    resource: "Address",
-    action: "update",
-    possession: "any",
-  })
-  async updateCustomers(
-    @common.Param() params: AddressWhereUniqueInput,
-    @common.Body() body: AddressWhereUniqueInput[],
-    @nestAccessControl.UserRoles() userRoles: string[]
-  ): Promise<void> {
-    const data = {
-      customers: {
-        set: body,
-      },
-    };
-    const permission = this.rolesBuilder.permission({
-      role: userRoles,
-      action: "update",
-      possession: "any",
-      resource: "Address",
-    });
-    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
-    if (invalidAttributes.length) {
-      const roles = userRoles
-        .map((role: string) => JSON.stringify(role))
-        .join(",");
-      throw new common.ForbiddenException(
-        `Updating the relationship: ${
-          invalidAttributes[0]
-        } of ${"Address"} is forbidden for roles: ${roles}`
-      );
-    }
-    await this.service.update({
-      where: params,
-      data,
-      select: { id: true },
-    });
-  }
-
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Delete("/:id/customers")
-  @nestAccessControl.UseRoles({
-    resource: "Address",
-    action: "update",
-    possession: "any",
-  })
-  async deleteCustomers(
-    @common.Param() params: AddressWhereUniqueInput,
-    @common.Body() body: AddressWhereUniqueInput[],
-    @nestAccessControl.UserRoles() userRoles: string[]
-  ): Promise<void> {
-    const data = {
-      customers: {
-        disconnect: body,
-      },
-    };
-    const permission = this.rolesBuilder.permission({
-      role: userRoles,
-      action: "update",
-      possession: "any",
-      resource: "Address",
-    });
-    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
-    if (invalidAttributes.length) {
-      const roles = userRoles
-        .map((role: string) => JSON.stringify(role))
-        .join(",");
-      throw new common.ForbiddenException(
-        `Updating the relationship: ${
-          invalidAttributes[0]
-        } of ${"Address"} is forbidden for roles: ${roles}`
-      );
-    }
-    await this.service.update({
-      where: params,
-      data,
-      select: { id: true },
-    });
   }
 }

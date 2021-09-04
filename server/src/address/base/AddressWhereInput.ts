@@ -27,17 +27,6 @@ class AddressWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  address_2?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
   city?: StringNullableFilter;
 
   @ApiProperty({

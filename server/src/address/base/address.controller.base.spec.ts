@@ -12,44 +12,32 @@ const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
   address_1: "exampleAddress_1",
-  address_2: "exampleAddress_2",
   city: "exampleCity",
-  createdAt: new Date(),
   id: "exampleId",
   state: "exampleState",
-  updatedAt: new Date(),
   zip: 42,
 };
 const CREATE_RESULT = {
   address_1: "exampleAddress_1",
-  address_2: "exampleAddress_2",
   city: "exampleCity",
-  createdAt: new Date(),
   id: "exampleId",
   state: "exampleState",
-  updatedAt: new Date(),
   zip: 42,
 };
 const FIND_MANY_RESULT = [
   {
     address_1: "exampleAddress_1",
-    address_2: "exampleAddress_2",
     city: "exampleCity",
-    createdAt: new Date(),
     id: "exampleId",
     state: "exampleState",
-    updatedAt: new Date(),
     zip: 42,
   },
 ];
 const FIND_ONE_RESULT = {
   address_1: "exampleAddress_1",
-  address_2: "exampleAddress_2",
   city: "exampleCity",
-  createdAt: new Date(),
   id: "exampleId",
   state: "exampleState",
-  updatedAt: new Date(),
   zip: 42,
 };
 
@@ -114,24 +102,14 @@ describe("Address", () => {
       .post("/addresses")
       .send(CREATE_INPUT)
       .expect(HttpStatus.CREATED)
-      .expect({
-        ...CREATE_RESULT,
-        createdAt: CREATE_RESULT.createdAt.toISOString(),
-        updatedAt: CREATE_RESULT.updatedAt.toISOString(),
-      });
+      .expect(CREATE_RESULT);
   });
 
   test("GET /addresses", async () => {
     await request(app.getHttpServer())
       .get("/addresses")
       .expect(HttpStatus.OK)
-      .expect([
-        {
-          ...FIND_MANY_RESULT[0],
-          createdAt: FIND_MANY_RESULT[0].createdAt.toISOString(),
-          updatedAt: FIND_MANY_RESULT[0].updatedAt.toISOString(),
-        },
-      ]);
+      .expect([FIND_MANY_RESULT[0]]);
   });
 
   test("GET /addresses/:id non existing", async () => {
@@ -149,11 +127,7 @@ describe("Address", () => {
     await request(app.getHttpServer())
       .get(`${"/addresses"}/${existingId}`)
       .expect(HttpStatus.OK)
-      .expect({
-        ...FIND_ONE_RESULT,
-        createdAt: FIND_ONE_RESULT.createdAt.toISOString(),
-        updatedAt: FIND_ONE_RESULT.updatedAt.toISOString(),
-      });
+      .expect(FIND_ONE_RESULT);
   });
 
   afterAll(async () => {
