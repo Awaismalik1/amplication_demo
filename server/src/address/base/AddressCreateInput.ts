@@ -23,17 +23,6 @@ class AddressCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  address_2?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
   city?: string | null;
 
   @ApiProperty({

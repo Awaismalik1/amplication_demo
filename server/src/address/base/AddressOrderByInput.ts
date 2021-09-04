@@ -23,25 +23,7 @@ class AddressOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  address_2?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["Asc", "Desc"],
-  })
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
   city?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["Asc", "Desc"],
-  })
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  createdAt?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -60,15 +42,6 @@ class AddressOrderByInput {
     nullable: true,
   })
   state?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["Asc", "Desc"],
-  })
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  updatedAt?: SortOrder;
 
   @ApiProperty({
     required: false,
