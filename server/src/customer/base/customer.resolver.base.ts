@@ -14,9 +14,6 @@ import { DeleteCustomerArgs } from "./DeleteCustomerArgs";
 import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
 import { CustomerFindUniqueArgs } from "./CustomerFindUniqueArgs";
 import { Customer } from "./Customer";
-import { OrderFindManyArgs } from "../../order/base/OrderFindManyArgs";
-import { Order } from "../../order/base/Order";
-import { Address } from "../../address/base/Address";
 import { CustomerService } from "../customer.service";
 
 @graphql.Resolver(() => Customer)
@@ -126,15 +123,7 @@ export class CustomerResolverBase {
     // @ts-ignore
     return await this.service.create({
       ...args,
-      data: {
-        ...args.data,
-
-        address: args.data.address
-          ? {
-              connect: args.data.address,
-            }
-          : undefined,
-      },
+      data: args.data,
     });
   }
 
@@ -173,15 +162,7 @@ export class CustomerResolverBase {
       // @ts-ignore
       return await this.service.update({
         ...args,
-        data: {
-          ...args.data,
-
-          address: args.data.address
-            ? {
-                connect: args.data.address,
-              }
-            : undefined,
-        },
+        data: args.data,
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -213,55 +194,5 @@ export class CustomerResolverBase {
       }
       throw error;
     }
-  }
-
-  @graphql.ResolveField(() => [Order])
-  @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "read",
-    possession: "any",
-  })
-  async orders(
-    @graphql.Parent() parent: Customer,
-    @graphql.Args() args: OrderFindManyArgs,
-    @gqlUserRoles.UserRoles() userRoles: string[]
-  ): Promise<Order[]> {
-    const permission = this.rolesBuilder.permission({
-      role: userRoles,
-      action: "read",
-      possession: "any",
-      resource: "Order",
-    });
-    const results = await this.service.findOrders(parent.id, args);
-
-    if (!results) {
-      return [];
-    }
-
-    return results.map((result) => permission.filter(result));
-  }
-
-  @graphql.ResolveField(() => Address, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "Customer",
-    action: "read",
-    possession: "any",
-  })
-  async address(
-    @graphql.Parent() parent: Customer,
-    @gqlUserRoles.UserRoles() userRoles: string[]
-  ): Promise<Address | null> {
-    const permission = this.rolesBuilder.permission({
-      role: userRoles,
-      action: "read",
-      possession: "any",
-      resource: "Address",
-    });
-    const result = await this.service.getAddress(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return permission.filter(result);
   }
 }
